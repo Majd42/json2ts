@@ -1,0 +1,14 @@
+{
+  "name": "json2ts-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Paste JSON, get TypeScript types — a single self-contained web page.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --experimental-strip-types src/*.test.ts",
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
