@@ -1,0 +1,20 @@
+# Terraform state — can contain secrets in plaintext; never commit
+*.tfstate
+*.tfstate.*
+
+# Provider plugins & local working dir (large, machine-specific)
+.terraform/
+.terraform.tfstate.lock.info
+
+# Variable files that may hold secrets
+*.tfvars
+*.tfvars.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Keep committed:
+#   main.tf              — your infrastructure
+#   .terraform.lock.hcl  — pins provider versions for reproducible builds
+!.terraform.lock.hcl
