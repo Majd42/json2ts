@@ -184,9 +184,18 @@ data "aws_iam_policy_document" "trust" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/main"]
+      # GitHub now embeds immutable numeric IDs in the OIDC subject, e.g.
+      #   repo:Majd42@100345071/json2ts@1332422519:ref:refs/heads/main
+      # The @* wildcards match those IDs without hardcoding them, and stay
+      # secure: the owner/repo names are still anchored exactly.
+      values = ["repo:${local.owner}@*/${local.repo}@*:ref:refs/heads/main"]
     }
   }
+}
+
+locals {
+  owner = split("/", var.github_repo)[0]
+  repo  = split("/", var.github_repo)[1]
 }
 
 resource "aws_iam_role" "deploy" {
