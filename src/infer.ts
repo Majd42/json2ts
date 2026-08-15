@@ -52,12 +52,17 @@ export function jsonToTs(value: unknown, options: Partial<Options> = {}): string
 
   const reg = new Registry(opts);
 
-  // When the root is an object it claims `rootName` as its interface. Otherwise
-  // the name belongs to a type alias, so reserve it before resolving nested
-  // objects to prevent a collision (e.g. `type Users = Users[]`).
-  if (raw.kind !== "object") reg.reserve(opts.rootName);
+  // Reserve `rootName` before resolving anything nested so no generated
+  // interface can claim it — whether it ends up on the root interface or on a
+  // type alias (e.g. `type Users = Users[]`). Object roots register their own
+  // fields first, so without this a nested key matching `rootName` would steal
+  // the name and bump the root to `Root2`.
+  reg.reserve(opts.rootName);
 
-  const rootRef = resolve(raw, opts.rootName, reg);
+  const rootRef =
+    raw.kind === "object"
+      ? resolveRootObject(raw, opts.rootName, reg)
+      : resolve(raw, opts.rootName, reg);
 
   if (rootRef.kind === "object") {
     return reg.emit(rootRef.name) + "\n";
@@ -197,6 +202,18 @@ class Registry {
     return name;
   }
 
+  /**
+   * Register a shape under a pre-reserved name (the root). Unlike `add`, this
+   * never defers to an identically-shaped interface — the root always keeps the
+   * name the caller asked for.
+   */
+  addNamed(shape: EmittedShape, name: string, sig: string): string {
+    if (!this.bySignature.has(sig)) this.bySignature.set(sig, name);
+    this.byName.set(name, shape);
+    this.used.add(name);
+    return name;
+  }
+
   emit(rootName: string | null): string {
     const names = [...this.byName.keys()];
     const ordered = rootName
@@ -218,6 +235,25 @@ class Registry {
       ? `${prefix}type ${name} = {${body}};`
       : `${prefix}interface ${name} {${body}}`;
   }
+}
+
+/**
+ * Resolve the top-level object, forcing it to keep `rootName`. Its fields are
+ * resolved first (registering any nested objects), then the root shape itself
+ * is registered under the reserved name via `addNamed`.
+ */
+function resolveRootObject(
+  node: Extract<Raw, { kind: "object" }>,
+  rootName: string,
+  reg: Registry,
+): Ref {
+  const fields = new Map<string, { type: Ref; optional: boolean }>();
+  for (const [key, f] of node.fields) {
+    fields.set(key, { type: resolve(f.type, key, reg), optional: f.optional });
+  }
+  const shape: EmittedShape = { fields };
+  const name = reg.addNamed(shape, rootName, shapeSignature(shape));
+  return { kind: "object", name };
 }
 
 /** Walk the raw tree, registering objects and producing a render-ready Ref. */

@@ -63,6 +63,13 @@ test("root array of objects → alias over element interface", () => {
   assert.match(out, /type Rows = Row\[\];/);
 });
 
+test("root keeps rootName when a nested key collides with it", () => {
+  const out = jsonToTs({ user: { name: "Ada" } }, { rootName: "User" });
+  // The root interface must own `User`; the nested object is bumped instead.
+  assert.match(out, /interface User \{\s*user: User2;\s*\}/);
+  assert.match(out, /interface User2 \{\s*name: string;\s*\}/);
+});
+
 test("root primitive → type alias", () => {
   assert.equal(jsonToTs(42, { rootName: "N" }).trim(), "type N = number;");
 });
