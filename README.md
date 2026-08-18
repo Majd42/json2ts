@@ -22,7 +22,8 @@ Then open `dist/index.html` in any browser (double-click it, or
 - An **array of objects with differing keys** collapses into a *single*
   interface, with keys missing from some elements marked optional (`pinned?`).
 - Structurally identical shapes are **de-duplicated** into one shared interface.
-- Array keys are singularized for element names (`posts` → `interface Post`).
+- Array keys are singularized for element names (`posts` → `interface Post`),
+  including common irregular plurals (`people` → `Person`, `children` → `Child`).
 - Non-identifier keys are quoted (`"first-name": string`).
 
 ### Options
