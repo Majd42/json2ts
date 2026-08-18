@@ -351,8 +351,31 @@ export function toPascalCase(input: string): string {
   return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
 }
 
+/** Common irregular plurals, keyed by lowercase plural form. */
+const IRREGULAR_PLURALS: Record<string, string> = {
+  people: "person",
+  children: "child",
+  men: "man",
+  women: "woman",
+  teeth: "tooth",
+  feet: "foot",
+  mice: "mouse",
+  geese: "goose",
+};
+
+/** Preserve the casing pattern of `plural` when substituting `singular`. */
+function matchCase(plural: string, singular: string): string {
+  if (plural === plural.toUpperCase()) return singular.toUpperCase();
+  if (plural[0] === plural[0].toUpperCase()) {
+    return singular.charAt(0).toUpperCase() + singular.slice(1);
+  }
+  return singular;
+}
+
 /** Rough singularization for element name hints ("categories" → "Category"). */
 function singularize(word: string): string {
+  const irregular = IRREGULAR_PLURALS[word.toLowerCase()];
+  if (irregular) return matchCase(word, irregular);
   if (/ies$/i.test(word)) return word.replace(/ies$/i, "y");
   if (/(s|sh|ch|x|z)es$/i.test(word)) return word.replace(/es$/i, "");
   if (/ss$/i.test(word)) return word;

@@ -70,6 +70,15 @@ test("root keeps rootName when a nested key collides with it", () => {
   assert.match(out, /interface User2 \{\s*name: string;\s*\}/);
 });
 
+test("irregular plurals singularize for element names", () => {
+  const people = jsonToTs({ people: [{ name: "Ada" }] });
+  assert.match(people, /people: Person\[\];/);
+  assert.match(people, /interface Person \{\s*name: string;\s*\}/);
+
+  const children = jsonToTs({ children: [{ age: 3 }] });
+  assert.match(children, /children: Child\[\];/);
+});
+
 test("root primitive → type alias", () => {
   assert.equal(jsonToTs(42, { rootName: "N" }).trim(), "type N = number;");
 });
