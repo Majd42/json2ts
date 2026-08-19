@@ -23,7 +23,8 @@ Then open `dist/index.html` in any browser (double-click it, or
   interface, with keys missing from some elements marked optional (`pinned?`).
 - Structurally identical shapes are **de-duplicated** into one shared interface.
 - Array keys are singularized for element names (`posts` → `interface Post`),
-  including common irregular plurals (`people` → `Person`, `children` → `Child`).
+  including common irregular plurals (`people` → `Person`, `children` → `Child`,
+  `leaves` → `Leaf`, `knives` → `Knife`).
 - Non-identifier keys are quoted (`"first-name": string`).
 
 ### Options
