@@ -351,7 +351,11 @@ export function toPascalCase(input: string): string {
   return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
 }
 
-/** Common irregular plurals, keyed by lowercase plural form. */
+/**
+ * Common irregular plurals, keyed by lowercase plural form. Includes `-ves`
+ * plurals whose singular ending (`-f` vs `-fe`) can't be derived by rule
+ * (`leaves` → `leaf`, but `knives` → `knife`).
+ */
 const IRREGULAR_PLURALS: Record<string, string> = {
   people: "person",
   children: "child",
@@ -361,6 +365,18 @@ const IRREGULAR_PLURALS: Record<string, string> = {
   feet: "foot",
   mice: "mouse",
   geese: "goose",
+  leaves: "leaf",
+  wolves: "wolf",
+  halves: "half",
+  calves: "calf",
+  shelves: "shelf",
+  elves: "elf",
+  loaves: "loaf",
+  thieves: "thief",
+  knives: "knife",
+  wives: "wife",
+  lives: "life",
+  selves: "self",
 };
 
 /** Preserve the casing pattern of `plural` when substituting `singular`. */

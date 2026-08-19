@@ -77,6 +77,13 @@ test("irregular plurals singularize for element names", () => {
 
   const children = jsonToTs({ children: [{ age: 3 }] });
   assert.match(children, /children: Child\[\];/);
+
+  // -ves plurals whose singular ending isn't rule-derivable.
+  const leaves = jsonToTs({ leaves: [{ vein: 1 }] });
+  assert.match(leaves, /leaves: Leaf\[\];/);
+
+  const knives = jsonToTs({ knives: [{ blade: "steel" }] });
+  assert.match(knives, /knives: Knife\[\];/);
 });
 
 test("root primitive → type alias", () => {
